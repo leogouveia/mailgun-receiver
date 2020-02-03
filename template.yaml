@@ -1,39 +1,112 @@
-AWSTemplateFormatVersion: '2010-09-09'
+AWSTemplateFormatVersion: "2010-09-09"
 Transform: AWS::Serverless-2016-10-31
 Description: >
   mailgun-receiver
 
-  Sample SAM Template for mailgun-receiver
-  
 # More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
 Globals:
   Function:
-    Timeout: 3
+    Runtime: nodejs12.x
+    Timeout: 10
+    Handler: app.lambdaHandler
 
 Resources:
-  HelloWorldFunction:
-    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+  MailgunStoreFunction:
+    Type: AWS::Serverless::Function
     Properties:
-      CodeUri: hello-world/
+      CodeUri: mailgun-store/
       Handler: app.lambdaHandler
-      Runtime: nodejs12.x
       Events:
-        HelloWorld:
-          Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
+        StoreData:
+          Type: Api
           Properties:
-            Path: /hello
+            Path: /
+            Method: post
+        GetData:
+          Type: Api
+          Properties:
+            Path: /
             Method: get
+  MailgunTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      AttributeDefinitions:
+        - AttributeName: "Id"
+          AttributeType: "S"
+        - AttributeName: "Event"
+          AttributeType: "S"
+        - AttributeName: "RecipientDomain"
+          AttributeType: "S"
+        - AttributeName: "Recipient"
+          AttributeType: "S"
+        - AttributeName: "Message.Id"
+          AttributeType: "S"
+        - AttributeName: "Message.Headers.To"
+          AttributeType: "S"
+        - AttributeName: "Message.Headers.From"
+          AttributeType: "S"
+        - AttributeName: "Message.Headers.Subject"
+          AttributeType: "S"
+        - AttributeName: "Message.Size"
+          AttributeType: "S"
+        - AttributeName: "Timestamp"
+          AttributeType: "N"
+        - AttributeName: "Signature.Token"
+          AttributeType: "S"
+        - AttributeName: "Signature.Signature"
+          AttributeType: "S"
+        - AttributeName: "Signature.Timestamp"
+          AttributeType: "S"
+        - AttributeName: "Storage.url"
+          AttributeType: "S"
+        - AttributeName: "Storage.key"
+          AttributeType: "S"
+        - AttributeName: "Envelope.SendingIp"
+          AttributeType: "S"
+        - AttributeName: "Envelope.Sender"
+          AttributeType: "S"
+        - AttributeName: "Envelope.Transport"
+          AttributeType: "S"
+        - AttributeName: "Envelope.Targets"
+          AttributeType: "S"
+        - AttributeName: "DeliveryStatus.Tls"
+          AttributeType: "S"
+        - AttributeName: "DeliveryStatus.MxHost"
+          AttributeType: "S"
+        - AttributeName: "DeliveryStatus.AttemptNo"
+          AttributeType: "N"
+        - AttributeName: "DeliveryStatus.Description"
+          AttributeType: "S"
+        - AttributeName: "DeliveryStatus.SessionSeconds"
+          AttributeType: "N"
+        - AttributeName: "DeliveryStatus.Utf8"
+          AttributeType: "S"
+        - AttributeName: "DeliveryStatus.Code"
+          AttributeType: "N"
+        - AttributeName: "DeliveryStatus.Message"
+          AttributeType: "S"
+        - AttributeName: "DeliveryStatus.CertificateVerified"
+          AttributeType: "S"
+      KeySchema:
+        - AttributeName: "Id"
+          KeyType: "HASH"
+        - AttributeName: "Message.Id"
+          KeyType: "RANGE"
+      ProvisionedThroughput:
+        ReadCapacityUnits: "5"
+        WriteCapacityUnits: "5"
+      TableName: "mailGunTable"
 
 Outputs:
   # ServerlessRestApi is an implicit API created out of Events key under Serverless::Function
   # Find out more about other implicit resources you can reference within SAM
   # https://github.com/awslabs/serverless-application-model/blob/master/docs/internals/generated_resources.rst#api
-  HelloWorldApi:
-    Description: "API Gateway endpoint URL for Prod stage for Hello World function"
-    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/hello/"
-  HelloWorldFunction:
-    Description: "Hello World Lambda Function ARN"
-    Value: !GetAtt HelloWorldFunction.Arn
-  HelloWorldFunctionIamRole:
-    Description: "Implicit IAM Role created for Hello World function"
-    Value: !GetAtt HelloWorldFunctionRole.Arn
+  MailgunStoreApi:
+    Description: "API Gateway endpoint URL for Prod stage for Mail Gun Store function"
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/"
+  MailgunStoreFunction:
+    Description: "Mailgun Store Lambda Function ARN"
+    Value: !GetAtt MailGunStoreFunction.Arn
+  MailgunStoreFunctionIamRole:
+    Description: "Implicit IAM Role created for Mailgun Store function"
+    Value: !GetAtt MailgunStoreFunctionRole.Arn
