@@ -1,0 +1,44 @@
+{
+  "name": "mailgun-receiver",
+  "version": "1.0.0",
+  "description": "This project contains source code and supporting files for a serverless application that you can deploy with the SAM CLI. It includes the following files and folders.",
+  "main": "webpack.config.js",
+  "scripts": {
+    "watch": "NODE_ENV=dev NODE_OPTIONS='--max-old-space-size=2048' webpack --watch --mode=development",
+    "build": "NODE_ENV=prod NODE_OPTIONS='--max-old-space-size=2048' BUNDLE_ANALYZER=false webpack --mode=production --progress",
+    "build-analyze": "NODE_ENV=prod BUNDLE_ANALYZER=true webpack --mode=production --progress",
+    "lint": "tslint --project tsconfig.json 'src/**/*.ts'",
+    "pretest": "npm run lint",
+    "test": "jest"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/leogouveia/mailgun-receiver.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/leogouveia/mailgun-receiver/issues"
+  },
+  "homepage": "https://github.com/leogouveia/mailgun-receiver#readme",
+  "dependencies": {
+    "@types/aws-lambda": "^8.10.40",
+    "@types/node": "^13.7.0",
+    "aws-lambda": "^1.0.5"
+  },
+  "devDependencies": {
+    "@types/jest": "^25.1.1",
+    "jest": "^25.1.0",
+    "source-map-loader": "^0.2.4",
+    "speed-measure-webpack-plugin": "^1.3.1",
+    "ts-jest": "^25.2.0",
+    "ts-loader": "^6.2.1",
+    "ts-node": "^8.6.2",
+    "tslint": "^6.0.0",
+    "typescript": "^3.7.5",
+    "webpack": "^4.41.5",
+    "webpack-bundle-analyzer": "^3.6.0",
+    "webpack-cli": "^3.3.10"
+  }
+}

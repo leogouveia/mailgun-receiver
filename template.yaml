@@ -7,15 +7,24 @@ Description: >
 Globals:
   Function:
     Runtime: nodejs12.x
-    Timeout: 10
-    Handler: app.lambdaHandler
+    Timeout: 29
+    Tracing: Active
 
 Resources:
+  WebhookTopic:
+    Type: AWS::SNS::Topic
+
   MailgunStoreFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: mailgun-store/
+      CodeUri: build/mailgun-store/
       Handler: app.lambdaHandler
+      Environment:
+        Variables:
+          WEBHOOK_TOPIC: !Ref WebhookTopic
+      Policies:
+        - SNSPublishMessagePolicy:
+            TopicName: !GetAtt WebhookTopic.TopicName
       Events:
         StoreData:
           Type: Api
@@ -110,9 +119,19 @@ Outputs:
   MailgunStoreApi:
     Description: "API Gateway endpoint URL for Prod stage for Mail Gun Store function"
     Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/"
+
   MailgunStoreFunction:
     Description: "Mailgun Store Lambda Function ARN"
     Value: !GetAtt MailGunStoreFunction.Arn
+
   MailgunStoreFunctionIamRole:
     Description: "Implicit IAM Role created for Mailgun Store function"
     Value: !GetAtt MailgunStoreFunctionRole.Arn
+
+    WebhookTopicArn:
+      Description: "A webhook event SNS topic Arn"
+      Value: !Ref WebhookTopic
+
+    WebhookTopicName:
+      Description: "A name of the webhook SNS topic"
+      Value: !GetAtt WebhookTopic.TopicName
