@@ -1,47 +1,25 @@
 const path = require("path");
-const { readFileSync } = require("fs");
-const UglifyJsPlugin = require("uglifyjs-webpack-plugin");
-const { yamlParse } = require("yaml-cfn");
+const glob = require("glob");
+const webpack = require("webpack");
+const BundleAnalyzerPlugin = require("webpack-bundle-analyzer")
+  .BundleAnalyzerPlugin;
+const SpeedMeasurePlugin = require("speed-measure-webpack-plugin");
+const smp = new SpeedMeasurePlugin();
 
-const conf = {
-  prodMode: process.env.NODE_ENV === "production",
-  templatePath: "../template.yaml"
-};
-// const cfn = yamlParse(readFileSync(conf.templatePath));
-// const entries = Object.values(cfn.Resources)
-//   // Find nodejs functions
-//   .filter(v => v.Type === "AWS::Serverless::Function")
-//   .filter(
-//     v =>
-//       (v.Properties.Runtime && v.Properties.Runtime.startsWith("nodejs")) ||
-//       (!v.Properties.Runtime && cfn.Globals.Function.Runtime)
-//   )
-//   .map(v => ({
-//     // Isolate handler src filename
-//     handlerFile: v.Properties.Handler.split(".")[0],
-//     // Build handler dst path
-//     CodeUri: v.Properties.CodeUri.split("/")
-//       .splice(2)
-//       .join("/")
-//   }))
-//   .reduce(
-//     (entries, v) =>
-//       Object.assign(
-//         entries,
-//         // Generate {outputPath: inputPath} object
-//         { [`${v.CodeUri}/${v.handlerFile}`]: `./src/${v.handlerFile}.ts` }
-//       ),
-//     {}
-//   );
+// Credits: https://hackernoon.com/webpack-creating-dynamically-named-outputs-for-wildcarded-entry-files-9241f596b065
+const entryArray = glob.sync("./src/**/app.ts");
+const entryObject = entryArray.reduce((acc, item) => {
+  let name = path.dirname(item.replace("./src/", ""));
+  // conforms with Webpack entry API
+  // Example: { test: './src/test/app.ts' }
+  acc[name] = item;
+  return acc;
+}, {});
 
-// console.log("entries", entries);
-// console.log(`Building for ${conf.prodMode ? "production" : "development"}...`);
-
-module.exports = {
-  // http://codys.club/blog/2015/07/04/webpack-create-multiple-bundles-with-entry-points/#sec-3
-  entry: "./src/app.ts",
+const config = smp.wrap({
+  entry: entryObject,
+  devtool: "source-map",
   target: "node",
-  mode: conf.prodMode ? "production" : "development",
   module: {
     rules: [
       {
@@ -51,22 +29,33 @@ module.exports = {
       }
     ]
   },
+  optimization: {
+    minimize: false
+  },
+  plugins: [new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/)],
   resolve: {
-    extensions: [".tsx", ".ts", ".js"]
+    extensions: [".ts", ".js"],
+    symlinks: false,
+    cacheWithContext: false
   },
+  // Output directive will generate build/<function-name>/app.js
   output: {
-    path: path.resolve(__dirname, "."),
-    filename: "app.js",
+    filename: "[name]/app.js",
+    path: path.resolve(__dirname, "build"),
+    devtoolModuleFilenameTemplate: "[absolute-resource-path]",
+    // credits to Rich Buggy!!!
     libraryTarget: "commonjs2"
-  },
-  devtool: "source-map",
-  plugins: conf.prodMode
-    ? [
-        new UglifyJsPlugin({
-          parallel: true,
-          extractComments: true,
-          sourceMap: true
-        })
-      ]
-    : []
-};
+  }
+});
+
+if (process.env.BUNDLE_ANALYZER && process.env.BUNDLE_ANALYZER === "true") {
+  config.plugins.push(
+    new BundleAnalyzerPlugin({
+      analyzerMode: "static",
+      reportFilename: "../info/bundle-report.html",
+      openAnalyzer: false
+    })
+  );
+}
+
+module.exports = config;

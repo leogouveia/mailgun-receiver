@@ -1,35 +1,51 @@
 {
-  "name": "mailgun-store",
+  "name": "mailgun-receiver",
   "version": "1.0.0",
-  "description": "",
-  "main": "app.js",
+  "description": "This project contains source code and supporting files for a serverless application that you can deploy with the SAM CLI. It includes the following files and folders.",
+  "main": "webpack.config.js",
   "scripts": {
-    "start": "webpack -w",
-    "test": "jest",
-    "build": "NODE_ENV=${NODE_ENV:-production} webpack",
-    "package": "sam package --template-file ../template.yaml --s3-bucket $npm_package_name-${STAGE:-dev} --output-template-file template.packaged.yaml",
-    "deploy": "sam deploy --template-file template.packaged.yaml --stack-name $npm_package_name-${STAGE:-dev} --capabilities CAPABILITY_IAM --parameter-override Stage=${STAGE:-dev} ProjectName=$npm_package_name --no-fail-on-empty-changeset",
-    "clean": "rm -rf -v dist/*"
+    "watch": "cross-env NODE_ENV=dev NODE_OPTIONS='--max-old-space-size=2048' webpack --watch --mode=development",
+    "build": "cross-env NODE_ENV=prod NODE_OPTIONS='--max-old-space-size=2048' BUNDLE_ANALYZER=false webpack --mode=production --progress",
+    "build-analyze": "cross-env NODE_ENV=prod BUNDLE_ANALYZER=true webpack --mode=production --progress",
+    "lint": "tslint --project tsconfig.json 'src/**/*.ts'",
+    "pretest": "npm run lint",
+    "test": "jest"
   },
-  "author": "Leonardo de Albuquerque Gouveia",
-  "license": "MIT",
-  "devDependencies": {
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/leogouveia/mailgun-receiver.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/leogouveia/mailgun-receiver/issues"
+  },
+  "homepage": "https://github.com/leogouveia/mailgun-receiver#readme",
+  "dependencies": {
     "@types/aws-lambda": "^8.10.40",
+    "@types/node": "^13.7.0",
+    "aws-lambda": "^1.0.5",
+    "aws-sdk": "^2.610.0"
+  },
+  "devDependencies": {
     "@types/chai": "^4.2.8",
     "@types/jest": "^25.1.1",
-    "@types/node": "^13.7.0",
-    "aws-sdk": "^2.610.0",
     "chai": "^4.2.0",
+    "cross-env": "^7.0.0",
+    "jest": "^25.1.0",
     "mocha": "^7.0.1",
-    "ts-jest": "^25.1.0",
+    "source-map-loader": "^0.2.4",
+    "speed-measure-webpack-plugin": "^1.3.1",
+    "ts-jest": "^25.2.0",
     "ts-loader": "^6.2.1",
     "ts-node": "^8.6.2",
     "tslint": "^6.0.0",
     "tslint-config-prettier": "^1.18.0",
     "tslint-config-standard": "^9.0.0",
     "typescript": "^3.7.5",
-    "uglifyjs-webpack-plugin": "^2.2.0",
     "webpack": "^4.41.5",
+    "webpack-bundle-analyzer": "^3.6.0",
     "webpack-cli": "^3.3.10",
     "yaml-cfn": "^0.2.3"
   },

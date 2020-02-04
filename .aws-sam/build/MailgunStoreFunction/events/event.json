@@ -1,0 +1,62 @@
+{
+  "body": "{\"signature\":{\"timestamp\":\"1580671907\",\"token\":\"5c10c0d917a933ea05f87d01aa71bb038c7ef53a8722d9fb01\",\"signature\":\"9e759d52bd333007162bd51a3e50d909564257a3b61a838d29966b7cb12785e4\"},\"event-data\":{\"tags\":[\"my_tag_1\",\"my_tag_2\"],\"timestamp\":1521472262.908181,\"storage\":{\"url\":\"https://se.api.mailgun.net/v3/domains/mg.leogouveia.com/messages/message_key\",\"key\":\"message_key\"},\"envelope\":{\"sending-ip\":\"209.61.154.250\",\"sender\":\"bob@mg.leogouveia.com\",\"transport\":\"smtp\",\"targets\":\"alice@example.com\"},\"recipient-domain\":\"example.com\",\"id\":\"CPgfbmQMTCKtHW6uIWtuVe\",\"campaigns\":[],\"user-variables\":{\"my_var_1\":\"Mailgun Variable #1\",\"my-var-2\":\"awesome\"},\"flags\":{\"is-routed\":false,\"is-authenticated\":true,\"is-system-test\":false,\"is-test-mode\":false},\"log-level\":\"info\",\"message\":{\"headers\":{\"to\":\"Alice <alice@example.com>\",\"message-id\":\"20130503182626.18666.16540@mg.leogouveia.com\",\"from\":\"Bob <bob@mg.leogouveia.com>\",\"subject\":\"Test delivered webhook\"},\"attachments\":[],\"size\":111},\"recipient\":\"alice@example.com\",\"event\":\"delivered\",\"delivery-status\":{\"tls\":true,\"mx-host\":\"smtp-in.example.com\",\"attempt-no\":1,\"description\":\"\",\"session-seconds\":0.4331989288330078,\"utf8\":true,\"code\":250,\"message\":\"OK\",\"certificate-verified\":true}}}",
+  "resource": "/{proxy+}",
+  "path": "/path/to/resource",
+  "httpMethod": "POST",
+  "isBase64Encoded": false,
+  "queryStringParameters": {
+    "foo": "bar"
+  },
+  "pathParameters": {
+    "proxy": "/path/to/resource"
+  },
+  "stageVariables": {
+    "baz": "qux"
+  },
+  "headers": {
+    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
+    "Accept-Encoding": "gzip, deflate, sdch",
+    "Accept-Language": "en-US,en;q=0.8",
+    "Cache-Control": "max-age=0",
+    "CloudFront-Forwarded-Proto": "https",
+    "CloudFront-Is-Desktop-Viewer": "true",
+    "CloudFront-Is-Mobile-Viewer": "false",
+    "CloudFront-Is-SmartTV-Viewer": "false",
+    "CloudFront-Is-Tablet-Viewer": "false",
+    "CloudFront-Viewer-Country": "US",
+    "Host": "1234567890.execute-api.us-east-1.amazonaws.com",
+    "Upgrade-Insecure-Requests": "1",
+    "User-Agent": "Custom User Agent String",
+    "Via": "1.1 08f323deadbeefa7af34d5feb414ce27.cloudfront.net (CloudFront)",
+    "X-Amz-Cf-Id": "cDehVQoZnx43VYQb9j2-nvCh-9z396Uhbp027Y2JvkCPNLmGJHqlaA==",
+    "X-Forwarded-For": "127.0.0.1, 127.0.0.2",
+    "X-Forwarded-Port": "443",
+    "X-Forwarded-Proto": "https"
+  },
+  "requestContext": {
+    "accountId": "123456789012",
+    "resourceId": "123456",
+    "stage": "prod",
+    "requestId": "c6af9ac6-7b61-11e6-9a41-93e8deadbeef",
+    "requestTime": "09/Apr/2015:12:34:56 +0000",
+    "requestTimeEpoch": 1428582896000,
+    "identity": {
+      "cognitoIdentityPoolId": null,
+      "accountId": null,
+      "cognitoIdentityId": null,
+      "caller": null,
+      "accessKey": null,
+      "sourceIp": "127.0.0.1",
+      "cognitoAuthenticationType": null,
+      "cognitoAuthenticationProvider": null,
+      "userArn": null,
+      "userAgent": "Custom User Agent String",
+      "user": null
+    },
+    "path": "/prod/path/to/resource",
+    "resourcePath": "/{proxy+}",
+    "httpMethod": "POST",
+    "apiId": "1234567890",
+    "protocol": "HTTP/1.1"
+  }
+}

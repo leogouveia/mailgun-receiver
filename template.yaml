@@ -105,12 +105,6 @@ Resources:
         ReadCapacityUnits: "5"
         WriteCapacityUnits: "5"
       TableName: "mailGunTable"
-  MailTopic:
-    Type: AWS::SNS::Topic
-    Properties:
-      Subscription:
-        - Protocol: email
-          Endpoint: !Ref NotificationEmail
 
 Outputs:
   # ServerlessRestApi is an implicit API created out of Events key under Serverless::Function

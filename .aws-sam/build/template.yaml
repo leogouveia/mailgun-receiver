@@ -6,14 +6,26 @@ Description: 'mailgun-receiver
 Globals:
   Function:
     Runtime: nodejs12.x
-    Timeout: 10
-    Handler: app.lambdaHandler
+    Timeout: 29
+    Tracing: Active
 Resources:
+  WebhookTopic:
+    Type: AWS::SNS::Topic
   MailgunStoreFunction:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: MailgunStoreFunction
       Handler: app.lambdaHandler
+      Environment:
+        Variables:
+          WEBHOOK_TOPIC:
+            Ref: WebhookTopic
+      Policies:
+      - SNSPublishMessagePolicy:
+          TopicName:
+            Fn::GetAtt:
+            - WebhookTopic
+            - TopicName
       Events:
         StoreData:
           Type: Api
@@ -94,6 +106,13 @@ Resources:
         ReadCapacityUnits: '5'
         WriteCapacityUnits: '5'
       TableName: mailGunTable
+  MailTopic:
+    Type: AWS::SNS::Topic
+    Properties:
+      Subscription:
+      - Protocol: email
+        Endpoint:
+          Ref: NotificationEmail
 Outputs:
   MailgunStoreApi:
     Description: API Gateway endpoint URL for Prod stage for Mail Gun Store function
@@ -111,3 +130,13 @@ Outputs:
       Fn::GetAtt:
       - MailgunStoreFunctionRole
       - Arn
+    WebhookTopicArn:
+      Description: A webhook event SNS topic Arn
+      Value:
+        Ref: WebhookTopic
+    WebhookTopicName:
+      Description: A name of the webhook SNS topic
+      Value:
+        Fn::GetAtt:
+        - WebhookTopic
+        - TopicName

@@ -7,11 +7,11 @@ const SpeedMeasurePlugin = require("speed-measure-webpack-plugin");
 const smp = new SpeedMeasurePlugin();
 
 // Credits: https://hackernoon.com/webpack-creating-dynamically-named-outputs-for-wildcarded-entry-files-9241f596b065
-const entryArray = glob.sync("./src/**/lambda.ts");
+const entryArray = glob.sync("./src/**/app.ts");
 const entryObject = entryArray.reduce((acc, item) => {
   let name = path.dirname(item.replace("./src/", ""));
   // conforms with Webpack entry API
-  // Example: { test: './src/test/lambda.ts' }
+  // Example: { test: './src/test/app.ts' }
   acc[name] = item;
   return acc;
 }, {});
@@ -38,9 +38,9 @@ const config = smp.wrap({
     symlinks: false,
     cacheWithContext: false
   },
-  // Output directive will generate build/<function-name>/lambda.js
+  // Output directive will generate build/<function-name>/app.js
   output: {
-    filename: "[name]/lambda.js",
+    filename: "[name]/app.js",
     path: path.resolve(__dirname, "build"),
     devtoolModuleFilenameTemplate: "[absolute-resource-path]",
     // credits to Rich Buggy!!!
