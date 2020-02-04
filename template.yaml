@@ -11,20 +11,41 @@ Globals:
     Tracing: Active
 
 Resources:
-  WebhookTopic:
+  MailgunTopic:
     Type: AWS::SNS::Topic
+
+  MailgunTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      AttributeDefinitions:
+        - AttributeName: "Id"
+          AttributeType: "S"
+        - AttributeName: "Message.Id"
+          AttributeType: "S"
+      KeySchema:
+        - AttributeName: "Id"
+          KeyType: "HASH"
+        - AttributeName: "Message.Id"
+          KeyType: "RANGE"
+      ProvisionedThroughput:
+        ReadCapacityUnits: "5"
+        WriteCapacityUnits: "5"
+      TableName: "mailgunTable"
 
   MailgunStoreFunction:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: build/mailgun-store/
-      Handler: app.lambdaHandler
+      Handler: lambda.handler
       Environment:
         Variables:
-          WEBHOOK_TOPIC: !Ref WebhookTopic
+          WEBHOOK_TOPIC: !Ref MailgunTopic
       Policies:
+        - AWSLambdaDynamoDBExecutionRole
+        - DynamoDBCrudPolicy:
+            TableName: "*"
         - SNSPublishMessagePolicy:
-            TopicName: !GetAtt WebhookTopic.TopicName
+            TopicName: !GetAtt MailgunTopic.TopicName
       Events:
         StoreData:
           Type: Api
@@ -36,76 +57,6 @@ Resources:
           Properties:
             Path: /
             Method: get
-  MailgunTable:
-    Type: AWS::DynamoDB::Table
-    Properties:
-      AttributeDefinitions:
-        - AttributeName: "Id"
-          AttributeType: "S"
-        - AttributeName: "Event"
-          AttributeType: "S"
-        - AttributeName: "RecipientDomain"
-          AttributeType: "S"
-        - AttributeName: "Recipient"
-          AttributeType: "S"
-        - AttributeName: "Message.Id"
-          AttributeType: "S"
-        - AttributeName: "Message.Headers.To"
-          AttributeType: "S"
-        - AttributeName: "Message.Headers.From"
-          AttributeType: "S"
-        - AttributeName: "Message.Headers.Subject"
-          AttributeType: "S"
-        - AttributeName: "Message.Size"
-          AttributeType: "S"
-        - AttributeName: "Timestamp"
-          AttributeType: "N"
-        - AttributeName: "Signature.Token"
-          AttributeType: "S"
-        - AttributeName: "Signature.Signature"
-          AttributeType: "S"
-        - AttributeName: "Signature.Timestamp"
-          AttributeType: "S"
-        - AttributeName: "Storage.url"
-          AttributeType: "S"
-        - AttributeName: "Storage.key"
-          AttributeType: "S"
-        - AttributeName: "Envelope.SendingIp"
-          AttributeType: "S"
-        - AttributeName: "Envelope.Sender"
-          AttributeType: "S"
-        - AttributeName: "Envelope.Transport"
-          AttributeType: "S"
-        - AttributeName: "Envelope.Targets"
-          AttributeType: "S"
-        - AttributeName: "DeliveryStatus.Tls"
-          AttributeType: "S"
-        - AttributeName: "DeliveryStatus.MxHost"
-          AttributeType: "S"
-        - AttributeName: "DeliveryStatus.AttemptNo"
-          AttributeType: "N"
-        - AttributeName: "DeliveryStatus.Description"
-          AttributeType: "S"
-        - AttributeName: "DeliveryStatus.SessionSeconds"
-          AttributeType: "N"
-        - AttributeName: "DeliveryStatus.Utf8"
-          AttributeType: "S"
-        - AttributeName: "DeliveryStatus.Code"
-          AttributeType: "N"
-        - AttributeName: "DeliveryStatus.Message"
-          AttributeType: "S"
-        - AttributeName: "DeliveryStatus.CertificateVerified"
-          AttributeType: "S"
-      KeySchema:
-        - AttributeName: "Id"
-          KeyType: "HASH"
-        - AttributeName: "Message.Id"
-          KeyType: "RANGE"
-      ProvisionedThroughput:
-        ReadCapacityUnits: "5"
-        WriteCapacityUnits: "5"
-      TableName: "mailGunTable"
-
 Outputs:
   # ServerlessRestApi is an implicit API created out of Events key under Serverless::Function
   # Find out more about other implicit resources you can reference within SAM
@@ -116,16 +67,16 @@ Outputs:
 
   MailgunStoreFunction:
     Description: "Mailgun Store Lambda Function ARN"
-    Value: !GetAtt MailGunStoreFunction.Arn
+    Value: !GetAtt MailgunStoreFunction.Arn
 
   MailgunStoreFunctionIamRole:
     Description: "Implicit IAM Role created for Mailgun Store function"
     Value: !GetAtt MailgunStoreFunctionRole.Arn
 
-    WebhookTopicArn:
-      Description: "A webhook event SNS topic Arn"
-      Value: !Ref WebhookTopic
+  MailgunTopicArn:
+    Description: "A webhook event SNS topic Arn"
+    Value: !Ref MailgunTopic
 
-    WebhookTopicName:
-      Description: "A name of the webhook SNS topic"
-      Value: !GetAtt WebhookTopic.TopicName
+  MailgunTopicName:
+    Description: "A name of the webhook SNS topic"
+    Value: !GetAtt MailgunTopic.TopicName

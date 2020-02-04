@@ -2,9 +2,10 @@ version = 0.1
 [default]
 [default.deploy]
 [default.deploy.parameters]
-stack_name = "sam-app-teste"
+stack_name = "mailgun-webhook"
 s3_bucket = "aws-sam-cli-managed-default-samclisourcebucket-11h43igj4cfu0"
-s3_prefix = "sam-app-teste"
+s3_prefix = "mailgun-webhook"
 region = "us-east-1"
 confirm_changeset = true
 capabilities = "CAPABILITY_IAM"
+
