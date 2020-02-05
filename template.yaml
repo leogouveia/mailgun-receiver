@@ -3,6 +3,11 @@ Transform: AWS::Serverless-2016-10-31
 Description: >
   mailgun-receiver
 
+Parameters:
+  TableName:
+    Type: String
+    Default: "MailgunTable"
+
 # More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
 Globals:
   Function:
@@ -18,19 +23,19 @@ Resources:
     Type: AWS::DynamoDB::Table
     Properties:
       AttributeDefinitions:
-        - AttributeName: "Id"
+        - AttributeName: "id"
           AttributeType: "S"
-        - AttributeName: "Message.Id"
+        - AttributeName: "eventId"
           AttributeType: "S"
       KeySchema:
-        - AttributeName: "Id"
+        - AttributeName: "id"
           KeyType: "HASH"
-        - AttributeName: "Message.Id"
+        - AttributeName: "eventId"
           KeyType: "RANGE"
       ProvisionedThroughput:
         ReadCapacityUnits: "5"
         WriteCapacityUnits: "5"
-      TableName: "mailgunTable"
+      TableName: !Ref TableName
 
   MailgunStoreFunction:
     Type: AWS::Serverless::Function
@@ -39,7 +44,8 @@ Resources:
       Handler: lambda.handler
       Environment:
         Variables:
-          WEBHOOK_TOPIC: !Ref MailgunTopic
+          MAILGUN_TOPIC: !Ref MailgunTopic
+          MAILGUN_TABLE: !Ref TableName
       Policies:
         - AWSLambdaDynamoDBExecutionRole
         - DynamoDBCrudPolicy:
@@ -74,9 +80,9 @@ Outputs:
     Value: !GetAtt MailgunStoreFunctionRole.Arn
 
   MailgunTopicArn:
-    Description: "A webhook event SNS topic Arn"
+    Description: "SNS topic Arn"
     Value: !Ref MailgunTopic
 
   MailgunTopicName:
-    Description: "A name of the webhook SNS topic"
+    Description: "SNS topic name"
     Value: !GetAtt MailgunTopic.TopicName
