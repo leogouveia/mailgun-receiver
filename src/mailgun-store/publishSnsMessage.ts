@@ -2,7 +2,7 @@ interface ISnsLib {
   publish: Function;
 }
 
-const publishMessage = async (snsTextPublisher: any, message: string) => {
+const publishSnsMessage = async (snsTextPublisher: any, message: string) => {
   try {
     const topic = process.env.MAILGUN_TOPIC;
     const params = {
@@ -10,12 +10,9 @@ const publishMessage = async (snsTextPublisher: any, message: string) => {
       TopicArn: topic
     };
     const data = await snsTextPublisher.publish(params).promise();
-    console.log(
-      `Message ${params.Message} send sent to the topic ${params.TopicArn}`
-    );
-    console.log("MessageID is " + data.MessageId);
+    return data;
   } catch (err) {
     console.error(err, err.stack);
   }
 };
-export default publishMessage;
+export default publishSnsMessage;
